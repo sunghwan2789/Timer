@@ -1,0 +1,67 @@
+﻿<Window x:Class="Timer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Timer"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="215.789" Width="350">
+    <Window.Resources>
+        <local:FillHeightFontSizeConverter x:Key="FillHeightFontSizeConverter" />
+    </Window.Resources>
+    <Grid x:Name="container">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.7*"/>
+            <RowDefinition Height="0.3*"/>
+        </Grid.RowDefinitions>
+        <Viewbox Grid.Row="0" Grid.Column="0" 
+                 Grid.ColumnSpan="2">
+            <TextBox x:Name="Timer" 
+                     Text="00:00"
+                     BorderThickness="0"
+                     Background="Transparent" 
+                     AllowDrop="False" 
+                     TextAlignment="Center"
+                     PreviewTextInput="Timer_PreviewTextInput" />
+        </Viewbox>
+        <Button x:Name="Start" 
+                Content="▶" 
+                Grid.Row="1" Grid.Column="0" 
+                FontSize="{Binding ElementName=Start, Path=ActualHeight, Converter={StaticResource FillHeightFontSizeConverter}}" 
+                Background="#FF64F122" 
+                Click="Start_Click" 
+                Foreground="White"
+                Style="{DynamicResource CustomButton}"/>
+        <Button x:Name="Pause" 
+                Content="❙❙" 
+                Visibility="Hidden"
+                Grid.Row="1" Grid.Column="0" 
+                FontSize="{Binding ElementName=Start, Path=ActualHeight, Converter={StaticResource FillHeightFontSizeConverter}}" 
+                Background="#FFFF2929"
+                Click="Pause_Click"
+                Foreground="White"
+                Style="{DynamicResource CustomButton}"/>
+        <Button x:Name="Reset" 
+                Content="♻" 
+                Grid.Row="1" Grid.Column="1" 
+                FontSize="{Binding ElementName=Reset, Path=ActualHeight, Converter={StaticResource FillHeightFontSizeConverter}}" 
+                Background="#FF68C1E2" 
+                Click="Reset_Click" 
+                Foreground="White" 
+                Style="{DynamicResource CustomButton}"/>
+        <Expander HorizontalAlignment="Right" 
+                  VerticalAlignment="Center" 
+                  Grid.Row="0" Grid.Column="1" 
+                  Grid.RowSpan="2" 
+                  ExpandDirection="Left" 
+                  Style="{DynamicResource CustomExpander}">
+            <local:History x:Name="HistoryPanel"
+                  Background="#FFE5E5E5" 
+                  Height="{Binding ElementName=container, Path=ActualHeight}"/>
+        </Expander>
+    </Grid>
+</Window>
