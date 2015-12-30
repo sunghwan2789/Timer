@@ -63,5 +63,14 @@
                   Background="#FFE5E5E5" 
                   Height="{Binding ElementName=container, Path=ActualHeight}"/>
         </Expander>
+        <TextBlock x:Name="Pin" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Top" 
+                   Margin="7" 
+                   FontSize="14"
+                   Text="📌" 
+                   Opacity="0.3" 
+                   Cursor="Hand"
+                   PreviewMouseDown="Pin_PreviewMouseDown"/>
     </Grid>
 </Window>

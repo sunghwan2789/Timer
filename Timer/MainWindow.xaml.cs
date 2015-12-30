@@ -196,5 +196,21 @@ namespace Timer
             }
             Timer.SelectionStart = start + 1;
         }
+
+        private void Pin_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            const double UNPINNED = 0.3;
+
+            if (Pin.Opacity == UNPINNED)
+            {
+                Topmost = true;
+                Pin.Opacity = 1;
+            }
+            else
+            {
+                Topmost = false;
+                Pin.Opacity = UNPINNED;
+            }
+        }
     }
 }
