@@ -5,15 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace Timer
 {
-    class FillHeightFontSizeConverter : IValueConverter
+    class Multiplier : MarkupExtension, IValueConverter
     {
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var actualHeight = (double) value;
-            return actualHeight / 2;
+            return System.Convert.ToDouble(value) * System.Convert.ToDouble(parameter);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

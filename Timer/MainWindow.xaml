@@ -5,11 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Timer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="215.789" Width="350">
+        Title="Timer" Height="215.789" Width="350">
     <Window.Resources>
-        <local:FillHeightFontSizeConverter x:Key="FillHeightFontSizeConverter" />
+        <Style x:Key="CustomButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#FFFFFFFF"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight, Converter={local:Multiplier}, ConverterParameter=0.5}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard x:Name="hover">
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="border"
+                                                            Storyboard.TargetProperty="Background.Color"
+                                                            To="Gray" 
+                                                            FillBehavior="HoldEnd"
+                                                            Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <StopStoryboard BeginStoryboardName="hover"/>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
-    <Grid x:Name="container">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -18,59 +51,44 @@
             <RowDefinition Height="0.7*"/>
             <RowDefinition Height="0.3*"/>
         </Grid.RowDefinitions>
-        <Viewbox Grid.Row="0" Grid.Column="0" 
+        <Viewbox Grid.Row="0" Grid.Column="0"
                  Grid.ColumnSpan="2">
-            <TextBox x:Name="Timer" 
+            <TextBox x:Name="txtTime"
                      Text="00:00"
                      BorderThickness="0"
-                     Background="Transparent" 
-                     AllowDrop="False" 
+                     Background="{x:Null}"
+                     AllowDrop="False"
                      TextAlignment="Center"
-                     PreviewTextInput="Timer_PreviewTextInput" />
+                     PreviewTextInput="txtTime_PreviewTextInput"/>
         </Viewbox>
-        <Button x:Name="Start" 
-                Content="▶" 
-                Grid.Row="1" Grid.Column="0" 
-                FontSize="{Binding ElementName=Start, Path=ActualHeight, Converter={StaticResource FillHeightFontSizeConverter}}" 
-                Background="#FF64F122" 
-                Click="Start_Click" 
-                Foreground="White"
-                Style="{DynamicResource CustomButton}"/>
-        <Button x:Name="Pause" 
-                Content="❙❙" 
+        <Button x:Name="btnStart"
+                Content="▶"
+                Grid.Row="1" Grid.Column="0"
+                Background="#FF64F122"
+                Click="btnStart_Click"
+                Style="{StaticResource CustomButton}"/>
+        <Button x:Name="btnPause"
+                Content="❙❙"
                 Visibility="Hidden"
-                Grid.Row="1" Grid.Column="0" 
-                FontSize="{Binding ElementName=Start, Path=ActualHeight, Converter={StaticResource FillHeightFontSizeConverter}}" 
+                Grid.Row="1" Grid.Column="0"
                 Background="#FFFF2929"
-                Click="Pause_Click"
-                Foreground="White"
-                Style="{DynamicResource CustomButton}"/>
-        <Button x:Name="Reset" 
-                Content="♻" 
-                Grid.Row="1" Grid.Column="1" 
-                FontSize="{Binding ElementName=Reset, Path=ActualHeight, Converter={StaticResource FillHeightFontSizeConverter}}" 
-                Background="#FF68C1E2" 
-                Click="Reset_Click" 
-                Foreground="White" 
-                Style="{DynamicResource CustomButton}"/>
-        <Expander HorizontalAlignment="Right" 
-                  VerticalAlignment="Center" 
-                  Grid.Row="0" Grid.Column="1" 
-                  Grid.RowSpan="2" 
-                  ExpandDirection="Left" 
-                  Style="{DynamicResource CustomExpander}">
-            <local:History x:Name="HistoryPanel"
-                  Background="#FFE5E5E5" 
-                  Height="{Binding ElementName=container, Path=ActualHeight}"/>
-        </Expander>
-        <TextBlock x:Name="Pin" 
-                   HorizontalAlignment="Left" 
-                   VerticalAlignment="Top" 
-                   Margin="7" 
+                Click="btnPause_Click"
+                Style="{StaticResource CustomButton}"/>
+        <Button x:Name="btnReset"
+                Content="♻"
+                Grid.Row="1" Grid.Column="1"
+                Background="#FF68C1E2"
+                Click="btnReset_Click"
+                Style="{StaticResource CustomButton}"/>
+        <TextBlock x:Name="lblPin"
+                   Text="📌"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Top"
+                   Margin="7"
                    FontSize="14"
-                   Text="📌" 
-                   Opacity="0.3" 
+                   Opacity="0.3"
                    Cursor="Hand"
-                   PreviewMouseDown="Pin_PreviewMouseDown"/>
+                   Grid.Row="0" Grid.Column="1"
+                   PreviewMouseDown="lblPin_PreviewMouseDown"/>
     </Grid>
 </Window>
