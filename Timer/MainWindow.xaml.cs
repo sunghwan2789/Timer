@@ -102,6 +102,9 @@ namespace Timer
             TimerThreadCTS = new CancellationTokenSource();
             Task.Run((Action) TimerThread, TimerThreadCTS.Token);
 
+            WinAPI.SetThreadExecutionState(WinAPI.EXECUTION_STATE.ES_CONTINUOUS |
+                WinAPI.EXECUTION_STATE.ES_DISPLAY_REQUIRED | WinAPI.EXECUTION_STATE.ES_SYSTEM_REQUIRED);
+
             btnPause.Visibility = Visibility.Visible;
             btnPause.Focus();
         }
@@ -119,6 +122,8 @@ namespace Timer
             TimerThreadCTS.Cancel();
 
             Bell.Stop();
+
+            WinAPI.SetThreadExecutionState(WinAPI.EXECUTION_STATE.ES_CONTINUOUS);
 
             btnStart.Visibility = Visibility.Visible;
             if (ReferenceEquals(sender, btnPause))
