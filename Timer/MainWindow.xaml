@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Timer"
         mc:Ignorable="d"
-        Title="Timer" Height="215.789" Width="350">
+        Title="Timer" Height="215.789" Width="350" PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Resources>
         <Style x:Key="CustomButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="BorderThickness" Value="0"/>
@@ -59,7 +59,7 @@
                      Background="{x:Null}"
                      AllowDrop="False"
                      TextAlignment="Center"
-                     PreviewTextInput="txtTime_PreviewTextInput"/>
+                     PreviewTextInput="txtTime_PreviewTextInput" GotFocus="txtTime_GotFocus"/>
         </Viewbox>
         <Button x:Name="btnStart"
                 Content="▶"

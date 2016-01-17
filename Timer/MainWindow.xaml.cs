@@ -1,21 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Media;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Timer
 {
@@ -27,6 +17,9 @@ namespace Timer
         public MainWindow()
         {
             InitializeComponent();
+
+            Bell = new SoundPlayer(Properties.Resources.Bell);
+            Bell.Load();
         }
 
         /// <summary>
@@ -38,18 +31,19 @@ namespace Timer
             txtTime.Text = string.Format("{0:00}:{1:00}", time / 60, time % 60);
         }
 
-        private SoundPlayer Bell = new SoundPlayer(Properties.Resources.Bell);
+        private SoundPlayer Bell;
 
         private int Time;
         private DateTime StartTime;
 
-        private CancellationTokenSource TimerThreadCTS = new CancellationTokenSource();
-        private async void TimerThread()
+        private CancellationTokenSource TimerThreadCTS;
+        private Task TimerThreadHandle;
+        private void TimerThread()
         {
             int leftTime;
             do
             {
-                await Task.Delay(200);
+                Thread.Sleep(200);
 
                 var ellapsed = DateTime.Now.Subtract(StartTime).TotalSeconds;
                 leftTime = Time - (int) ellapsed;
@@ -59,7 +53,7 @@ namespace Timer
                     return;
                 }
 
-                Dispatcher.Invoke(() => DrawTime(leftTime));
+                Dispatcher.Invoke(new Action(() => DrawTime(leftTime)));
             } while (leftTime > 0);
             
             Bell.PlayLooping();
@@ -76,12 +70,11 @@ namespace Timer
         {
             btnStart.Visibility = Visibility.Hidden;
 
-            TimerThreadCTS.Cancel();
-
             StartTime = DateTime.Now;
 
             var time = 0;
             var timeArray = txtTime.Text.Split(':');
+            int tmp;
             // dd:HH:mm:ss
             Debug.Assert(timeArray.Length <= 3, "Do not support converting day to time");
             // HH:?mm:ss
@@ -89,18 +82,18 @@ namespace Timer
             {
                 foreach (var timePart in timeArray)
                 {
-                    time = time * 60 + int.Parse(string.IsNullOrEmpty(timePart) ? "0" : timePart);
+                    time = time * 60 + (int.TryParse(timePart, out tmp) ? tmp : 0);
                 }
             }
             // ss?
             else
             {
-                time = int.Parse(timeArray.LastOrDefault() ?? "0");
+                time = int.TryParse(timeArray.LastOrDefault(), out tmp) ? tmp : 0;
             }
             Time = time;
 
             TimerThreadCTS = new CancellationTokenSource();
-            Task.Run((Action) TimerThread, TimerThreadCTS.Token);
+            TimerThreadHandle = Task.Factory.StartNew(TimerThread, TimerThreadCTS.Token);
 
             WinAPI.SetThreadExecutionState(WinAPI.EXECUTION_STATE.ES_CONTINUOUS |
                 WinAPI.EXECUTION_STATE.ES_DISPLAY_REQUIRED | WinAPI.EXECUTION_STATE.ES_SYSTEM_REQUIRED);
@@ -119,7 +112,8 @@ namespace Timer
         {
             btnPause.Visibility = Visibility.Hidden;
 
-            TimerThreadCTS.Cancel();
+            TimerThreadCTS?.Cancel();
+            TimerThreadHandle?.Wait();
 
             Bell.Stop();
 
@@ -160,10 +154,16 @@ namespace Timer
             }
 
             e.Handled = true;
-
+            
             int res;
             if (!int.TryParse(e.Text, out res))
             {
+                // 엔터 키 처리
+                if (e.Text.FirstOrDefault() == 13)
+                {
+                    btnPause_Click(sender, e);
+                    btnStart_Click(sender, e);
+                }
                 return;
             }
 
@@ -216,6 +216,20 @@ namespace Timer
                 Topmost = false;
                 lblPin.Opacity = UNPINNED;
             }
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                btnReset_Click(sender, e);
+                txtTime.Focus();
+            }
+        }
+
+        private void txtTime_GotFocus(object sender, RoutedEventArgs e)
+        {
+            btnPause_Click(sender, e);
         }
     }
 }
